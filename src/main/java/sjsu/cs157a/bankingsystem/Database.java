@@ -157,13 +157,13 @@ public class Database {
 	 * @param userID The users ID
 	 * @return Returns true if the account is created
 	 */
-	public static boolean createBankAccount(Connection conn, String bankName, String accType, int balance, int userID) {
+	public static boolean createBankAccount(Connection conn, String bankName, String accType, float balance, int userID) {
 		try {
 			String sql = "CALL CreateBankAccount(?, ?, ?, ?);";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, bankName);
 			pstmt.setString(2, accType);
-			pstmt.setInt(3, balance);
+			pstmt.setFloat(3, balance);
 			pstmt.setInt(4, userID);
 			pstmt.executeUpdate();
 			return true;
@@ -187,7 +187,7 @@ public class Database {
 			rset = pstmt.executeQuery();
 			
 			while(rset.next()) {
-				banks.add(new Bank(rset.getString(1), rset.getFloat(1)));
+				banks.add(new Bank(rset.getString(1), rset.getFloat(2)));
 			}
 		}
 		catch (Exception e) {
