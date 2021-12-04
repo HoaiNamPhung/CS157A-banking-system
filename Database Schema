@@ -1,4 +1,3 @@
-SELECT * FROM Accounts;DROP DATABASE IF EXISTS bank_system;
 CREATE DATABASE IF NOT EXISTS bank_system;
 USE bank_system;
 
@@ -93,10 +92,6 @@ END$$
 CREATE PROCEDURE CalculateNetWorth (userID TINYINT UNSIGNED)
 BEGIN
     SELECT SUM(balance) as NetWorth FROM Accounts WHERE Accounts.userID = userID;
-END$$
-CREATE PROCEDURE AddBank (bankName VARCHAR(256), balance DECIMAL(15, 2))
-BEGIN
-    INSERT INTO Banks(bankName, balance) VALUES(bankName, balance);
 END$$
 CREATE PROCEDURE GetAllBanks ()
 BEGIN
