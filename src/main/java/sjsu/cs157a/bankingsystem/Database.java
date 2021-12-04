@@ -178,16 +178,16 @@ public class Database {
 	 * @param conn The MySql connection
 	 * @return Returns all banks in the database
 	 */
-	public static List<String> getAllBanks(Connection conn) {
+	public static List<Bank> getAllBanks(Connection conn) {
 		ResultSet rset = null;
-		List<String> banks = new ArrayList<String>();
+		List<Bank> banks = new ArrayList<Bank>();
 		try {
 			String sql = "CALL GetAllBanks()";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			rset = pstmt.executeQuery();
 			
 			while(rset.next()) {
-				banks.add(rset.getString(1));
+				banks.add(new Bank(rset.getString(1), rset.getFloat(1)));
 			}
 		}
 		catch (Exception e) {

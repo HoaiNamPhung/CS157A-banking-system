@@ -101,7 +101,7 @@ public class App {
             switch (scanner.nextLine()) {
             case "1":
             	List<Account> userBankAccounts;
-            	List<String> banks;
+            	List<Bank> banks;
             	String bankName;
             	System.out.println("Please input a number from 1~4 to select an action.");
             	System.out.println("Create Bank Account (1) | Delete Bank Account (2) | Show Accounts/Check Account Balance (3) | Calcualte Your Net Worth (4)");
@@ -115,8 +115,7 @@ public class App {
                 		System.out.println("(" + (i + 1) + ") " + banks.get(i));
                 	}
                 	System.out.println("\nPlease input the number of the bank where you would like to open an account.");
-                	bankName = banks.get(scanner.nextInt() - 1);
-                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
                 	System.out.println("Please input the number of the account type you would like to open.");
                 	System.out.println("Checking (1) | Saving (2)");
                 	String accType = accountTypes[scanner.nextInt() - 1];
@@ -131,18 +130,18 @@ public class App {
                 		System.out.println("(" + (i + 1) + ") " + banks.get(i));
                 	}
                 	System.out.println("\nPlease input the number of the bank where you would like to delete an account.");
-                	bankName = banks.get(scanner.nextInt() - 1);
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
                 	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
                 	
                 	for(int i = 0; i < userBankAccounts.size(); i++) {
-                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).accType + " $" + userBankAccounts.get(i).balance);
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
                 	}
                 	
                 	System.out.println("\nPlease input the number of the account you would like to delete.");
                 	Account account = userBankAccounts.get(scanner.nextInt() - 1);
                 	
-                	Account.deleteBankAccount(conn, bankName, account.accType, userID);
-                	System.out.println("Your " + bankName + " " + account.accType + " account has been deleted.");
+                	Account.deleteBankAccount(conn, bankName, account.getAccType(), userID);
+                	System.out.println("Your " + bankName + " " + account.getAccType() + " account has been deleted.");
                 	break;
                 case "3":
                 	banks = Bank.getAllBanks(conn);
@@ -151,11 +150,11 @@ public class App {
                 		System.out.println("(" + (i + 1) + ") " + banks.get(i));
                 	}
                 	System.out.println("\nPlease input the number of the bank where you would like to view your view your accounts.");
-                	bankName = banks.get(scanner.nextInt() - 1);
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
                 	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
                 	
                 	for(int i = 0; i < userBankAccounts.size(); i++) {
-                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).accType + " $" + userBankAccounts.get(i).balance);
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
                 	}
                 	break;
                 case "4":

@@ -4,7 +4,31 @@ import java.sql.*;
 import java.util.List;
 
 public class Bank {
-	public static List<String> getAllBanks(Connection conn) {
+	private String bankName;
+	private float balance;
+	
+	Bank(String bankName, float balance) {
+		this.setBankName(bankName);
+		this.setBalance(balance);
+	}
+
+	public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	public float getBalance() {
+		return balance;
+	}
+
+	public void setBalance(float balance) {
+		this.balance = balance;
+	}
+	
+	public static List<Bank> getAllBanks(Connection conn) {
 		return Database.getAllBanks(conn);
 	}
 }

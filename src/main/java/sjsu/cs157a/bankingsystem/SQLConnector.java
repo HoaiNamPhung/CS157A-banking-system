@@ -44,7 +44,7 @@ public class SQLConnector {
 		if (conn == null) {
 			try {
 				login = getCredentials();
-				conn = DriverManager.getConnection(login[0] + DB_NAME, login[1], login[2]);
+				conn = DriverManager.getConnection(login[0] + DB_NAME, login[1], /*login[2]*/ "root");
 	        }
 			// Database might not yet exist.
 			catch (SQLSyntaxErrorException dbDNE) {
