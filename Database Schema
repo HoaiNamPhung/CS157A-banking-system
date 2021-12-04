@@ -1,3 +1,4 @@
+DROP DATABASE bank_system;
 CREATE DATABASE IF NOT EXISTS bank_system;
 USE bank_system;
 
@@ -83,7 +84,7 @@ BEGIN
 END$$
 CREATE PROCEDURE GetAllUserBankAccountsAtBank (bankName VARCHAR(256), userID TINYINT UNSIGNED)
 BEGIN
-    SELECT accType, balance FROM Accounts WHERE Accounts.userID = userID;
+    SELECT accType, balance FROM Accounts WHERE Accounts.bankName = bankName AND Accounts.userID = userID;
 END$$
 CREATE PROCEDURE GetBankAccountBalance (bankName VARCHAR(256), accType VARCHAR(8), userID TINYINT UNSIGNED)
 BEGIN
