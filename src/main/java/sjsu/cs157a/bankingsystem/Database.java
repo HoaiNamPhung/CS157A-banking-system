@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database {
 	
@@ -145,5 +147,154 @@ public class Database {
 			e.printStackTrace();
 		}
 		return -1;
+	}
+	
+	/**
+	 * @param conn The MySql connection
+	 * @param bankName The name of the bank
+	 * @param accType The type of account
+	 * @param balance The starting balance of the account
+	 * @param userID The users ID
+	 * @return Returns true if the account is created
+	 */
+	public static boolean createBankAccount(Connection conn, String bankName, String accType, int balance, int userID) {
+		try {
+			String sql = "CALL CreateBankAccount(?, ?, ?, ?);";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			pstmt.setString(2, accType);
+			pstmt.setInt(3, balance);
+			pstmt.setInt(4, userID);
+			pstmt.executeUpdate();
+			return true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * @param conn The MySql connection
+	 * @return Returns all banks in the database
+	 */
+	public static List<String> getAllBanks(Connection conn) {
+		ResultSet rset = null;
+		List<String> banks = new ArrayList<String>();
+		try {
+			String sql = "CALL GetAllBanks()";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()) {
+				banks.add(rset.getString(1));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return banks;
+	}
+
+	/**
+	 * @param conn The MySql connection
+	 * @param userID The users ID
+	 * @return Returns the account type and balance of all accounts at a given bank
+	 */
+	public static List<Account> getAllUserBankAccountsAtBank(Connection conn, String bankName, int userID) {
+		ResultSet rset = null;
+		List<Account> userBankAccounts = new ArrayList<Account>();
+		try {
+			String sql = "CALL GetAllUserBankAccountsAtBank(?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			pstmt.setInt(2, userID);
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()) {
+				userBankAccounts.add(new Account(rset.getString(1), rset.getFloat(2)));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return userBankAccounts;
+	}
+
+	/**
+	 * @param conn The MySql connection
+	 * @param bankName The name of the bank
+	 * @param accType The type of account
+	 * @param userID The users ID
+	 * @return
+	 */
+	public static boolean deleteBankAccount(Connection conn, String bankName, String accType, int userID) {
+		try {
+			String sql = "CALL DeleteBankAccount(?, ?, ?);";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			pstmt.setString(2, accType);
+			pstmt.setInt(3, userID);
+			int rowsUpdated = pstmt.executeUpdate();
+			// Success check.	
+			if (rowsUpdated == 0) {
+				throw new SQLException("No rows affected: user was not deleted.");
+			}
+			return true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * @param conn The MySql connection
+	 * @param bankName The name of the bank
+	 * @param accType The type of account
+	 * @param userID The users ID
+	 * @return Returns the balance of a users account
+	 */
+	public static float getBankAccountBalance(Connection conn, String bankName, String accType, int userID) {
+		ResultSet rset = null;
+		float balance = -1;
+		try {
+			String sql = "CALL GetBankAccountBalance(?, ?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			pstmt.setString(2, accType);
+			pstmt.setInt(3, userID);
+			rset = pstmt.executeQuery();
+			rset.next();
+			
+			balance = rset.getFloat(1);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return balance;
+	}
+
+	/**
+	 * @param conn The MySql connection
+	 * @param userID The users ID
+	 * @return Return a users net worth
+	 */
+	public static float calcualteNetWorth(Connection conn, int userID) {
+		ResultSet rset = null;
+		float netWorth = -1;
+		try {
+			String sql = "CALL CalculateNetWorth(?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userID);
+			rset = pstmt.executeQuery();
+			rset.next();
+			
+			netWorth = rset.getFloat(1);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return netWorth;
 	}
 }
