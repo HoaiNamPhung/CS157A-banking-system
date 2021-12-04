@@ -280,7 +280,7 @@ public class Database {
 	 * @param userID The users ID
 	 * @return Return a users net worth
 	 */
-	public static float calcualteNetWorth(Connection conn, int userID) {
+	public static float calculateNetWorth(Connection conn, int userID) {
 		ResultSet rset = null;
 		float netWorth = -1;
 		try {
