@@ -100,7 +100,7 @@ BEGIN
 END$$
 CREATE PROCEDURE GetAllBanks ()
 BEGIN
-    SELECT bankName from Banks;
+    SELECT bankName, balance from Banks;
 END$$
 DELIMITER ;
 
