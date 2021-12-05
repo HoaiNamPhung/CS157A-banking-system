@@ -3,7 +3,10 @@ package sjsu.cs157a.bankingsystem;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Hello world!
@@ -13,7 +16,7 @@ public class App {
 	public static void main( String[] args ) throws Exception
     {
     	// Prepare MySQL connection.
-        Connection conn = SQLConnector.getInstance().getConnection();
+        final Connection conn = SQLConnector.getInstance().getConnection();
         if (conn == null) {
             System.out.println( "No connection to local MySQL server. Please try again later." );
             throw new SQLException();
@@ -21,6 +24,15 @@ public class App {
         else {
         	System.out.println( "Connection to MySQL ready." );	
         }
+        
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+          @Override
+          public void run() {
+        	  User.archiveUsers(conn);
+          }
+        }, 0, 1000*60);
+
         
         // User state.   
         int userID = -1;
@@ -99,16 +111,172 @@ public class App {
             System.out.println("Accounts (1) | Transactions (2) | Loans (3) | Banks (4) | Delete User (8) | Sign Out (0)");
             switch (scanner.nextLine()) {
             case "1":
-            	System.out.println("Not yet implemented.");
+            	List<Account> userBankAccounts;
+            	List<Bank> banks;
+            	String bankName;
+            	Account account;
+            	float amount;
+            	System.out.println("Please input a number from 1~4 to select an action.");
+            	System.out.println("Create Bank Account (1) | Delete Bank Account (2) | Show Accounts at a Given Bank (3) | Check Account Balance (4) | Calculate Your Net Worth (5)");
+            	switch (scanner.nextLine()) {
+                case "1":
+                	banks = Bank.getAllBanks(conn);
+                	
+                	if(banks.size() == 0) {
+                		System.out.println("There are no banks in the system. To create an account first create a bank.");
+                	}
+                	else {
+	                	String[] accountTypes = {"Checking", "Savings"};
+	                	
+	                	System.out.println("Available banks.");
+	                	for(int i = 0; i < banks.size(); i++) {
+	                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+	                	}
+	                	System.out.println("\nPlease input the number of the bank where you would like to open an account.");
+	                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+	                	System.out.println("Please input the number of the account type you would like to open.");
+	                	System.out.println("Checking (1) | Saving (2)");
+	                	String accType = accountTypes[scanner.nextInt() - 1];
+	                	Account.createBankAccount(conn, bankName, accType, userID); 
+                	}
+                	break;
+                case "2":
+                	banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank where you would like to delete an account.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
+                	}
+                	
+                	System.out.println("\nPlease input the number of the account you would like to delete.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);
+                	
+                	Account.deleteBankAccount(conn, bankName, account.getAccType(), userID);
+                	System.out.println("Your " + bankName + " " + account.getAccType() + " account has been deleted.");
+                	break;
+                case "3":
+                	banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank where you would like to view your view your accounts.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType());
+                	}
+                	break;
+                case "4":
+                	banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank where you would like to check an account balance.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType());
+                	}
+                	
+                	System.out.println("\nPlease input the number of the account whos balance you would like to check.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);
+                	
+                	System.out.println("Balance of " + bankName + " " + account.getAccType() + " account: $" + Account.getBankAccountBalance(conn, bankName, account.getAccType(), userID));
+                	
+                	break;
+                case "5":
+                	System.out.println("Your net worth across your accounts: $" + Account.calculateNetWorth(conn, userID));
+                	break;
+            	}
             	break; 
 	        case "2":
-	        	System.out.println("Not yet implemented.");
+		    	System.out.println("Please input a number from 1~2 to select an action.");
+		    	System.out.println("Deposit (1) | Withdraw (2)");
+            	switch (scanner.nextLine()) {
+            	case "1":
+                	banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank where you would like to deposit.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType());
+                	}
+                	
+                	System.out.println("\nPlease input the number of the account you would like to deposit into.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);
+                	System.out.println("\nPlease input the amount you would like to deposit.");
+                	amount = scanner.nextFloat();
+                	Transaction.deposit(conn, userID, bankName, account.getAccType(), "Deposit", amount);
+                	System.out.println("Deposit complete");
+            		break;
+            	case "2":
+            		banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank where you would like to withdraw.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
+                	}
+                	
+                	System.out.println("\nPlease input the number of the account you would like to withdraw from.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);
+                	System.out.println("\nPlease input the amount you would like to withdraw.");
+                	amount = scanner.nextFloat();
+                	Transaction.withdraw(conn, userID, bankName, account.getAccType(), "Withdraw", amount);
+                	System.out.println("Withdraw complete");
+            		break;
+            	}
 	        	break;
 		    case "3":
-		    	System.out.println("Not yet implemented.");
+		    	System.out.println("Please input a number from 1~3 to select an action.");
+		    	System.out.println("Show Loans (1) | Open New Loan (2) | Make Loan Payment (3)");
+            	switch (scanner.nextLine()) {
+            	case "1":
+            		break;
+            	}
 		    	break;
 		    case "4":
-		    	System.out.println("Not yet implemented.");
+		    	System.out.println("Please input a number from 1~2 to select an action.");
+		    	System.out.println("Check Bank Balance (1) | Create Bank (2)");
+            	switch (scanner.nextLine()) {
+                case "1":
+			    	banks = Bank.getAllBanks(conn);
+			    	
+	            	for(int i = 0; i < banks.size(); i++) {
+	            		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+	            	}
+	            	System.out.println("\nPlease input the number of the bank whos balance you would like to check.");
+	            	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+	            	
+	            	System.out.println("The balance of " + bankName + " is $" + Bank.getBanksBalance(conn, bankName));
+	            	break;
+                case "2":
+			    	
+                	System.out.println("\nPlease input the name of the bank where you would like to open an account.");
+                	bankName = scanner.nextLine().toUpperCase();
+                	Bank.createBank(conn, bankName);
+	            	break;
+            	}
 		    	break;
 		    case "8":
 		    	System.out.println("Are you sure? This will delete the user permanently, making all assets inaccessible. (Y/N)");

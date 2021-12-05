@@ -1,11 +1,16 @@
 package sjsu.cs157a.bankingsystem;
 
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class User {
+	
+	public static void archiveUsers(Connection conn) {
+		Database.archiveUsers(conn);
+	}
 	/**
 	 * Registers a user to be part of the banking system.
 	 * @param conn The MySQL connection.
