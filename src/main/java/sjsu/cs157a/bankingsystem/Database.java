@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,17 +155,16 @@ public class Database {
 	 * @param conn The MySql connection
 	 * @param bankName The name of the bank
 	 * @param accType The type of account
-	 * @param balance The starting balance of the account
 	 * @param userID The users ID
 	 * @return Returns true if the account is created
 	 */
-	public static boolean createBankAccount(Connection conn, String bankName, String accType, float balance, int userID) {
+	public static boolean createBankAccount(Connection conn, String bankName, String accType , int userID) {
 		try {
 			String sql = "CALL CreateBankAccount(?, ?, ?, ?);";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, bankName);
 			pstmt.setString(2, accType);
-			pstmt.setFloat(3, balance);
+			pstmt.setFloat(3, 0);
 			pstmt.setInt(4, userID);
 			pstmt.executeUpdate();
 			return true;
@@ -296,5 +297,56 @@ public class Database {
 			e.printStackTrace();
 		}
 		return netWorth;
+	}
+
+	public static void archiveUsers(Connection conn) {
+        String sql = "CALL ArchiveUsers(?);";
+        PreparedStatement pstmt;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            LocalDate today = LocalDate.now().minusYears(1);
+            pstmt.setTimestamp(1, Timestamp.valueOf(today.atStartOfDay()));
+        }
+        catch (SQLException e){
+        	e.printStackTrace();
+        }
+    }
+
+	public static float getBanksBalance(Connection conn, String bankName) {
+		ResultSet rset = null;
+		float balance = -1;
+		try {
+			String sql = "CALL GetBanksBalance(?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			rset = pstmt.executeQuery();
+			rset.next();
+			
+			balance = rset.getFloat(1);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return balance;
+	}
+
+	public static boolean createBank(Connection conn, String bankName) {
+		try {
+			String sql = "CALL CreateBank(?, ?);";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bankName);
+			pstmt.setFloat(2, 0);
+			pstmt.executeUpdate();
+			return true;
+		}
+		catch(SQLIntegrityConstraintViolationException e) {
+			e.printStackTrace();
+			System.out.println("This bank already exists");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+		
 	}
 }

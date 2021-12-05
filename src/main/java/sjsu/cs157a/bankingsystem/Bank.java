@@ -31,4 +31,12 @@ public class Bank {
 	public static List<Bank> getAllBanks(Connection conn) {
 		return Database.getAllBanks(conn);
 	}
+	
+	public static float getBanksBalance(Connection conn, String bankName) {
+		return Database.getBanksBalance(conn, bankName);
+	}
+
+	public static boolean createBank(Connection conn, String bankName) {
+		return Database.createBank(conn, bankName);
+	}
 }

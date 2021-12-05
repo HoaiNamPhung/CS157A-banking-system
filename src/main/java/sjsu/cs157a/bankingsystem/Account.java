@@ -36,8 +36,8 @@ public class Account {
 	 * @param userID The users ID
 	 * @return Return boolean true if the bank account is created
 	 */
-	public static boolean createBankAccount(Connection conn, String bankName, String accType, float balance, int userID) {
-		return Database.createBankAccount(conn, bankName, accType, balance, userID);
+	public static boolean createBankAccount(Connection conn, String bankName, String accType , int userID) {
+		return Database.createBankAccount(conn, bankName, accType, userID);
 	}
 	
 	/**

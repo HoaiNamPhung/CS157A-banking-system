@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Hello world!
@@ -14,7 +16,7 @@ public class App {
 	public static void main( String[] args ) throws Exception
     {
     	// Prepare MySQL connection.
-        Connection conn = SQLConnector.getInstance().getConnection();
+        final Connection conn = SQLConnector.getInstance().getConnection();
         if (conn == null) {
             System.out.println( "No connection to local MySQL server. Please try again later." );
             throw new SQLException();
@@ -22,6 +24,15 @@ public class App {
         else {
         	System.out.println( "Connection to MySQL ready." );	
         }
+        
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+          @Override
+          public void run() {
+        	  User.archiveUsers(conn);
+          }
+        }, 0, 1000*60);
+
         
         // User state.   
         int userID = -1;
@@ -120,9 +131,7 @@ public class App {
                 	System.out.println("Please input the number of the account type you would like to open.");
                 	System.out.println("Checking (1) | Saving (2)");
                 	String accType = accountTypes[scanner.nextInt() - 1];
-                	System.out.println("Please input the balance you would like to open the account with.");
-                	float balance = scanner.nextFloat();
-                	Account.createBankAccount(conn, bankName, accType, balance, userID);    
+                	Account.createBankAccount(conn, bankName, accType, userID);    
                 	break;
                 case "2":
                 	banks = Bank.getAllBanks(conn);
@@ -190,7 +199,27 @@ public class App {
 		    	System.out.println("Not yet implemented.");
 		    	break;
 		    case "4":
-		    	System.out.println("Not yet implemented.");
+		    	System.out.println("Please input a number from 1~2 to select an action.");
+		    	System.out.println("Check Bank Balance (1) | Create Bank (2)");
+            	switch (scanner.nextLine()) {
+                case "1":
+			    	banks = Bank.getAllBanks(conn);
+			    	
+	            	for(int i = 0; i < banks.size(); i++) {
+	            		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+	            	}
+	            	System.out.println("\nPlease input the number of the bank whos balance you would like to check.");
+	            	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+	            	
+	            	System.out.println("The balance of " + bankName + " is $" + Bank.getBanksBalance(conn, bankName));
+	            	break;
+                case "2":
+			    	
+                	System.out.println("\nPlease input the name of the bank where you would like to open an account.");
+                	bankName = scanner.nextLine().toUpperCase();
+                	Bank.createBank(conn, bankName);
+	            	break;
+            	}
 		    	break;
 		    case "8":
 		    	System.out.println("Are you sure? This will delete the user permanently, making all assets inaccessible. (Y/N)");
