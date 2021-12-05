@@ -116,7 +116,7 @@ public class App {
             	String bankName;
             	Account account;
             	System.out.println("Please input a number from 1~4 to select an action.");
-            	System.out.println("Create Bank Account (1) | Delete Bank Account (2) | Show Accounts at a Given Bank (3) | Check Account Balance (4) | Calcualte Your Net Worth (5)");
+            	System.out.println("Create Bank Account (1) | Delete Bank Account (2) | Show Accounts at a Given Bank (3) | Check Account Balance (4) | Calculate Your Net Worth (5)");
             	switch (scanner.nextLine()) {
                 case "1":
                 	banks = Bank.getAllBanks(conn);

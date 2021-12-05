@@ -78,6 +78,6 @@ public class Account {
 	 * @return Return the net worth of a particular user across all of their bank accounts
 	 */
 	public static float calculateNetWorth(Connection conn, int userID) {
-		return Database.calcualteNetWorth(conn, userID);
+		return Database.calculateNetWorth(conn, userID);
 	}
 }

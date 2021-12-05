@@ -2,6 +2,7 @@ package sjsu.cs157a.bankingsystem;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,12 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
-	
+
 	/**
 	 * Creates a new database if it doesn't exist.
-	 * @param conn The MySQL connection.
+	 * 
+	 * @param conn   The MySQL connection.
 	 * @param dbName The new database name.
-	 * @return Returns true if given database exists, whether or not it needed to be added.
+	 * @return Returns true if given database exists, whether or not it needed to be
+	 *         added.
 	 */
 	public static boolean createDatabase(Connection conn, String dbName) {
 		try {
@@ -27,47 +30,51 @@ public class Database {
 			Statement stmt = conn.createStatement();
 			stmt.execute(sql);
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Creates a new table if it doesn't exist. This is a template; the SQL string should be modified to create a specific kind of table.
-	 * @param conn The MySQL connection.
+	 * Creates a new table if it doesn't exist. This is a template; the SQL string
+	 * should be modified to create a specific kind of table.
+	 * 
+	 * @param conn      The MySQL connection.
 	 * @param tableName The new table name.
-	 * @param dropTable Flag indicating whether or existing tables of the same name should be dropped beforehand.
-	 * @return Returns true if given table exists, whether or not it needed to be added.
+	 * @param dropTable Flag indicating whether or existing tables of the same name
+	 *                  should be dropped beforehand.
+	 * @return Returns true if given table exists, whether or not it needed to be
+	 *         added.
 	 */
 	public static boolean createTable(Connection conn, String tableName, boolean dropTable) {
 		try {
 			String dropSql = "DROP TABLE IF EXISTS " + tableName;
-			String createSql = "CREATE TABLE IF NOT EXISTS " + tableName +
-					"(uid INT PRIMARY KEY AUTO_INCREMENT, " +
-					"sampleText VARCHAR(255)";
+			String createSql = "CREATE TABLE IF NOT EXISTS " + tableName + "(uid INT PRIMARY KEY AUTO_INCREMENT, "
+					+ "sampleText VARCHAR(255)";
 			Statement stmt = conn.createStatement();
 			if (dropTable) {
 				stmt.execute(dropSql);
 			}
 			stmt.execute(createSql);
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Creates a new user.
-	 * @param conn The MySQL connection.
+	 * 
+	 * @param conn      The MySQL connection.
 	 * @param firstName The user's first name.
-	 * @param lastName The user's last name.
-	 * @param email The user's email. Must be unique.
-	 * @param pw The user's password.
-	 * @return Returns the new users unique userID. If unique key 'email' is already in use, returns -2. If creation fails for any other reason, returns -1.
+	 * @param lastName  The user's last name.
+	 * @param email     The user's email. Must be unique.
+	 * @param pw        The user's password.
+	 * @return Returns the new users unique userID. If unique key 'email' is already
+	 *         in use, returns -2. If creation fails for any other reason, returns
+	 *         -1.
 	 */
 	public static int createUser(Connection conn, String firstName, String lastName, String email, byte[] pw) {
 		try {
@@ -84,25 +91,23 @@ public class Database {
 			}
 			// Return new userID.
 			ResultSet rs = pstmt.executeQuery("SELECT LAST_INSERT_ID()");
-	        if (rs.next()) {
-	        	return rs.getInt(1);
-            }
-            else {
-                throw new SQLException("No rows affected: user was not created.");
-            }
-		}
-		catch (SQLIntegrityConstraintViolationException emailException) {
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else {
+				throw new SQLException("No rows affected: user was not created.");
+			}
+		} catch (SQLIntegrityConstraintViolationException emailException) {
 			return -2;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Deletes a user with a given userID.
-	 * @param conn The MySQL connection.
+	 * 
+	 * @param conn   The MySQL connection.
 	 * @param userID The user's unique user id.
 	 * @return Returns true on successful deletion.
 	 */
@@ -112,24 +117,25 @@ public class Database {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, userID);
 			int rowsUpdated = pstmt.executeUpdate();
-			// Success check.	
+			// Success check.
 			if (rowsUpdated == 0) {
 				throw new SQLException("No rows affected: user was not deleted.");
 			}
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Retrieves a given user's userID.
-	 * @param conn The MySQL connection.
+	 * 
+	 * @param conn  The MySQL connection.
 	 * @param email The user's email.
-	 * @param pw The user's password.
-	 * @return Returns the given user's userID. If query fails or user DNE, returns -1.
+	 * @param pw    The user's password.
+	 * @return Returns the given user's userID. If query fails or user DNE, returns
+	 *         -1.
 	 */
 	public static int getUserID(Connection conn, String email, byte[] pw) {
 		try {
@@ -138,27 +144,26 @@ public class Database {
 			cstmt.setString(1, email);
 			cstmt.setBytes(2, pw);
 			cstmt.registerOutParameter(3, Types.INTEGER);
-			cstmt.executeUpdate();	
+			cstmt.executeUpdate();
 			int userID = cstmt.getInt(3);
 			if (userID == 0) {
 				throw new SQLException("UserID does not exist for given email and password.");
 			}
 			return userID;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
+
 	/**
-	 * @param conn The MySql connection
+	 * @param conn     The MySql connection
 	 * @param bankName The name of the bank
 	 * @param accType The type of account
 	 * @param userID The users ID
 	 * @return Returns true if the account is created
 	 */
-	public static boolean createBankAccount(Connection conn, String bankName, String accType , int userID) {
+	public static boolean createBankAccount(Connection conn, String bankName, String accType, int userID) {
 		try {
 			String sql = "CALL CreateBankAccount(?, ?, ?, ?);";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -168,13 +173,12 @@ public class Database {
 			pstmt.setInt(4, userID);
 			pstmt.executeUpdate();
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param conn The MySql connection
 	 * @return Returns all banks in the database
@@ -186,19 +190,18 @@ public class Database {
 			String sql = "CALL GetAllBanks()";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			rset = pstmt.executeQuery();
-			
-			while(rset.next()) {
+
+			while (rset.next()) {
 				banks.add(new Bank(rset.getString(1), rset.getFloat(2)));
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return banks;
 	}
 
 	/**
-	 * @param conn The MySql connection
+	 * @param conn   The MySql connection
 	 * @param userID The users ID
 	 * @return Returns the account type and balance of all accounts at a given bank
 	 */
@@ -211,22 +214,21 @@ public class Database {
 			pstmt.setString(1, bankName);
 			pstmt.setInt(2, userID);
 			rset = pstmt.executeQuery();
-			
-			while(rset.next()) {
+
+			while (rset.next()) {
 				userBankAccounts.add(new Account(rset.getString(1), rset.getFloat(2)));
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return userBankAccounts;
 	}
 
 	/**
-	 * @param conn The MySql connection
+	 * @param conn     The MySql connection
 	 * @param bankName The name of the bank
-	 * @param accType The type of account
-	 * @param userID The users ID
+	 * @param accType  The type of account
+	 * @param userID   The users ID
 	 * @return
 	 */
 	public static boolean deleteBankAccount(Connection conn, String bankName, String accType, int userID) {
@@ -237,23 +239,22 @@ public class Database {
 			pstmt.setString(2, accType);
 			pstmt.setInt(3, userID);
 			int rowsUpdated = pstmt.executeUpdate();
-			// Success check.	
+			// Success check.
 			if (rowsUpdated == 0) {
 				throw new SQLException("No rows affected: user was not deleted.");
 			}
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
 	/**
-	 * @param conn The MySql connection
+	 * @param conn     The MySql connection
 	 * @param bankName The name of the bank
-	 * @param accType The type of account
-	 * @param userID The users ID
+	 * @param accType  The type of account
+	 * @param userID   The users ID
 	 * @return Returns the balance of a users account
 	 */
 	public static float getBankAccountBalance(Connection conn, String bankName, String accType, int userID) {
@@ -267,21 +268,20 @@ public class Database {
 			pstmt.setInt(3, userID);
 			rset = pstmt.executeQuery();
 			rset.next();
-			
+
 			balance = rset.getFloat(1);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return balance;
 	}
 
 	/**
-	 * @param conn The MySql connection
+	 * @param conn   The MySql connection
 	 * @param userID The users ID
 	 * @return Return a users net worth
 	 */
-	public static float calcualteNetWorth(Connection conn, int userID) {
+	public static float calculateNetWorth(Connection conn, int userID) {
 		ResultSet rset = null;
 		float netWorth = -1;
 		try {
@@ -290,13 +290,53 @@ public class Database {
 			pstmt.setInt(1, userID);
 			rset = pstmt.executeQuery();
 			rset.next();
-			
+
 			netWorth = rset.getFloat(1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return netWorth;
+	}
+
+	public static List<Transaction> getRecentTransactions(Connection conn, int userId, String bankName, String accType) {
+		ResultSet rs = null;
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		try {
+			String sql = "CALL GetRecentTransactions(?, ?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userId);
+			pstmt.setString(2, bankName);
+			pstmt.setString(3, accType);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				transactions.add(new Transaction(rs.getInt("userId"), rs.getString("bankName"), rs.getString("accType"), rs.getTimestamp("transDateTime").toLocalDateTime(), rs.getString("location"), rs.getString("summary"), rs.getString("transType"), rs.getFloat("amount"), rs.getFloat("netBalance")));
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		return netWorth;
+		return transactions;
+	}
+	
+	public static List<Transaction> getMonthlyTransactions(Connection conn, int userId, String bankName, String accType, LocalDate filterDate) {
+		ResultSet rs = null;
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		try {
+			String sql = "CALL GetMonthlyTransactions(?, ?, ?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userId);
+			pstmt.setString(2, bankName);
+			pstmt.setString(3, accType);
+			pstmt.setDate(4, Date.valueOf(filterDate));
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				transactions.add(new Transaction(rs.getInt("userId"), rs.getString("bankName"), rs.getString("accType"), rs.getTimestamp("transDateTime").toLocalDateTime(), rs.getString("location"), rs.getString("summary"), rs.getString("transType"), rs.getFloat("amount"), rs.getFloat("netBalance")));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return transactions;
 	}
 
 	public static void archiveUsers(Connection conn) {
