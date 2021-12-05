@@ -31,5 +31,9 @@ public class Loan {
 	public static List<Loan> getLoans(Connection conn, int userID) {
 		return Database.getLoans(conn, userID);
 	}
+	
+	public static void createLoan(Connection conn, int userID, String bankName, float amount) {
+		Database.createLoan(conn, userID, bankName, amount);
+	}
 
 }

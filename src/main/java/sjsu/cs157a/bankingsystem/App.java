@@ -173,7 +173,7 @@ public class App {
                 	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
                 	
                 	for(int i = 0; i < userBankAccounts.size(); i++) {
-                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType());
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " account under user " + userBankAccounts.get(i).getFirstName());
                 	}
                 	break;
                 case "4":
@@ -202,7 +202,7 @@ public class App {
             	}
             	break; 
 	        case "2":
-		    	System.out.println("Please input a number from 1~2 to select an action.");
+		    	System.out.println("Please input a number from 1~4 to select an action.");
 		    	System.out.println("Deposit (1) | Withdraw (2) | Check Latest Transactions (3) | Check Transactions for a Month (4)");
             	switch (scanner.nextLine()) {
             	case "1":
@@ -307,7 +307,7 @@ public class App {
 	        	break;
 		    case "3":
 		    	System.out.println("Please input a number from 1~3 to select an action.");
-		    	System.out.println("Show Loans (1) | Open New Loan (2) | Make Loan Payment (3)");
+		    	System.out.println("Show Loans (1) | Open New Loan (2)");
             	switch (scanner.nextLine()) {
             	case "1":
                 	loans = Loan.getLoans(conn, userID);
@@ -319,6 +319,25 @@ public class App {
                 		for(int i = 0; i < loans.size(); i++) {
                 			System.out.println("(" + (i + 1) + ")" + " " + loans.get(i).getBankName() + " $" +loans.get(i).getAmount());
                 		}
+                	}
+            		break;
+            	case "2":
+            		banks = Bank.getAllBanks(conn);
+                	
+                	if(banks.size() == 0) {
+                		System.out.println("There are no banks in the system. To create an account first create a bank.");
+                	}
+                	else {
+	                	System.out.println("Available banks.");
+	                	for(int i = 0; i < banks.size(); i++) {
+	                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+	                	}
+	                	System.out.println("\nPlease input the number of the bank where you would like to open a loan.");
+	                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+	                	System.out.println("\nPlease input the amount of the loan.");
+	                	amount = scanner.nextFloat();
+	                	Loan.createLoan(conn, userID, bankName, amount);
+	                	System.out.println("Loan successfully taken out from " + bankName + " for $" + amount);
                 	}
             		break;
             	}
