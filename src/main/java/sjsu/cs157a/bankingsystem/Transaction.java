@@ -34,6 +34,6 @@ public class Transaction {
 	}
 	
 	public static List<Transaction> getMonthlyTransactions(Connection conn, int userId, String bankName, String accType, LocalDate filterDate) {
-		return Database.getMonthlyTransactions(conn, userId, bankName, accType);
+		return Database.getMonthlyTransactions(conn, userId, bankName, accType, filterDate);
 	}
 }
