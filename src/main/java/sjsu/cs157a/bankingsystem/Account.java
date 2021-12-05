@@ -4,14 +4,24 @@ import java.sql.Connection;
 import java.util.List;
 
 public class Account {
+	private String firstName;
 	private String accType;
 	private float balance;
 	
-	public Account(String accType, float balance) {
+	public Account(String firstName, String accType, float balance) {
+		this.setFirstName(firstName);
 		this.setAccType(accType);
 		this.setBalance(balance);
 	}
 	
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
 	public float getBalance() {
 		return balance;
 	}

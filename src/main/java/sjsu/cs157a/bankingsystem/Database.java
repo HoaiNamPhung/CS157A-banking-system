@@ -216,7 +216,7 @@ public class Database {
 			rset = pstmt.executeQuery();
 
 			while (rset.next()) {
-				userBankAccounts.add(new Account(rset.getString(1), rset.getFloat(2)));
+				userBankAccounts.add(new Account(rset.getString("firstName"), rset.getString("accType"), rset.getFloat("balance")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -435,5 +435,23 @@ public class Database {
 			e.printStackTrace();
 		}
 		return loans;
+	}
+
+	public static void createLoan(Connection conn, int userID, String bankName, float amount) {
+		try {
+			String sql = "CALL CreateLoan(?, ?, ?, ?);";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userID);
+			pstmt.setString(2, bankName);
+			pstmt.setString(3, "Loans");
+			pstmt.setFloat(4, amount);
+			pstmt.executeUpdate();
+		}
+		catch(SQLIntegrityConstraintViolationException e) {
+			System.out.println("You do not have a loan account open with this bank. Please first create one.");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
