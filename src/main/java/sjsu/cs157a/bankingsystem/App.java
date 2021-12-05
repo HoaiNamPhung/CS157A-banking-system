@@ -112,6 +112,7 @@ public class App {
             switch (scanner.nextLine()) {
             case "1":
             	List<Account> userBankAccounts;
+            	List<Transaction> transactions;
             	List<Bank> banks;
             	List<Loan> loans;
             	String bankName;
@@ -202,7 +203,7 @@ public class App {
             	break; 
 	        case "2":
 		    	System.out.println("Please input a number from 1~2 to select an action.");
-		    	System.out.println("Deposit (1) | Withdraw (2)");
+		    	System.out.println("Deposit (1) | Withdraw (2) | Check Latest Transactions (3) | Check Transactions for a Month (4)");
             	switch (scanner.nextLine()) {
             	case "1":
                 	banks = Bank.getAllBanks(conn);
@@ -245,6 +246,62 @@ public class App {
                 	amount = scanner.nextFloat();
                 	Transaction.withdraw(conn, userID, bankName, account.getAccType(), "Withdraw", amount);
                 	System.out.println("Withdraw complete");
+            		break;
+            	case "3":
+            		banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank your account is from.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	if (userBankAccounts.size() == 0) {
+                		System.out.println("You have no accounts at this bank.");
+                		break;
+                	}
+                	
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
+                	}
+                	
+                	System.out.println("\nPlease input the number of the account you would like to use.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);  
+            		
+            		transactions = Transaction.getRecentTransactions(conn, userID, bankName, account.getAccType());
+                	for(Transaction t : transactions) {
+                		System.out.println("ID: " + t.getTransId() + " | Date: " + t.getTransDateTime() + " | Location: " + t.getLocation() + " | Summary: " + t.getSummary() + " | Type: " + t.getAmount() + " | Amount: $" + t.getAmount() + " | Net Balance: $" + t.getNetBalance());
+                	}
+                	break;
+            	case "4":
+            		banks = Bank.getAllBanks(conn);
+                	
+                	for(int i = 0; i < banks.size(); i++) {
+                		System.out.println("(" + (i + 1) + ") " + banks.get(i).getBankName());
+                	}
+                	System.out.println("\nPlease input the number of the bank your account is from.");
+                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
+                	userBankAccounts = Account.getAllUserBankAccountsAtBank(conn, bankName, userID);
+                	if (userBankAccounts.size() == 0) {
+                		System.out.println("You have no accounts at this bank.");
+                		break;
+                	}
+                	for(int i = 0; i < userBankAccounts.size(); i++) {
+                		System.out.println("(" + (i + 1) + ")" + " " + userBankAccounts.get(i).getAccType() + " $" + userBankAccounts.get(i).getBalance());
+                	}           	
+                	System.out.println("\nPlease input the number of the account you would like to use.");
+                	account = userBankAccounts.get(scanner.nextInt() - 1);
+                	
+            		System.out.println("\nPlease input the month (1~12) of the transaction you wish to see.");
+            		int month = scanner.nextInt();
+            		System.out.println("\nPlease input the year (i.e: 2021) of the transaction you wish to see.");
+            		int year = scanner.nextInt();
+            		LocalDate filterDate = LocalDate.of(year, month, 1);
+            		
+            		transactions = Transaction.getMonthlyTransactions(conn, userID, bankName, account.getAccType(), filterDate);
+                	for(Transaction t : transactions) {
+                		System.out.println("ID: " + t.getTransId() + " | Date: " + t.getTransDateTime() + " | Location: " + t.getLocation() + " | Summary: " + t.getSummary() + " | Type: " + t.getAmount() + " | Amount: $" + t.getAmount() + " | Net Balance: $" + t.getNetBalance());
+                	}
             		break;
             	}
 	        	break;

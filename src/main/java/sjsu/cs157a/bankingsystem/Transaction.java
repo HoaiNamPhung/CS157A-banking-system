@@ -29,6 +29,14 @@ public class Transaction {
 		this.netBalance = netBalance;
 	}
 	
+	public int getTransId() { return transId; }
+	public LocalDateTime getTransDateTime() { return transDateTime; }
+	public String getLocation() { return location; }
+	public String getSummary() { return summary; }
+	public String getTransType() { return transType; }
+	public float getAmount() { return amount; }
+	public float getNetBalance() { return netBalance; }
+	
 	public static List<Transaction> getRecentTransactions(Connection conn, int userId, String bankName, String accType) {
 		return Database.getRecentTransactions(conn, userId, bankName, accType);
 	}
