@@ -113,6 +113,7 @@ public class App {
             case "1":
             	List<Account> userBankAccounts;
             	List<Bank> banks;
+            	List<Loan> loans;
             	String bankName;
             	Account account;
             	float amount;
@@ -126,7 +127,7 @@ public class App {
                 		System.out.println("There are no banks in the system. To create an account first create a bank.");
                 	}
                 	else {
-	                	String[] accountTypes = {"Checking", "Savings"};
+	                	String[] accountTypes = {"Checking", "Savings", "Loans"};
 	                	
 	                	System.out.println("Available banks.");
 	                	for(int i = 0; i < banks.size(); i++) {
@@ -135,7 +136,7 @@ public class App {
 	                	System.out.println("\nPlease input the number of the bank where you would like to open an account.");
 	                	bankName = banks.get(scanner.nextInt() - 1).getBankName();
 	                	System.out.println("Please input the number of the account type you would like to open.");
-	                	System.out.println("Checking (1) | Saving (2)");
+	                	System.out.println("Checking (1) | Saving (2) | Loan (3)");
 	                	String accType = accountTypes[scanner.nextInt() - 1];
 	                	Account.createBankAccount(conn, bankName, accType, userID); 
                 	}
@@ -252,6 +253,16 @@ public class App {
 		    	System.out.println("Show Loans (1) | Open New Loan (2) | Make Loan Payment (3)");
             	switch (scanner.nextLine()) {
             	case "1":
+                	loans = Loan.getLoans(conn, userID);
+                	
+                	if(loans.size() == 0) {
+                		System.out.println("You do not have any loans.");
+                	}
+                	else {
+                		for(int i = 0; i < loans.size(); i++) {
+                			System.out.println("(" + (i + 1) + ")" + " " + loans.get(i).getBankName() + " $" +loans.get(i).getAmount());
+                		}
+                	}
             		break;
             	}
 		    	break;

@@ -418,4 +418,22 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
+
+	public static List<Loan> getLoans(Connection conn, int userID) {
+		ResultSet rs = null;
+		List<Loan> loans = new ArrayList<Loan>();
+		try {
+			String sql = "CALL GetLoans(?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userID);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				loans.add(new Loan(rs.getString("bankName"), rs.getFloat("amount")));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return loans;
+	}
 }
